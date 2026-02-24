@@ -13,15 +13,17 @@ const validateContact = [
 const createTransporter = () => {
   if (process.env.EMAIL_SERVICE === 'gmail') {
     return nodemailer.createTransport({
-      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
       },
-      // التعديل الجديد هنا لتجاوز حماية الـ SSL في الـ Localhost
       tls: {
         rejectUnauthorized: false
-      }
+      },
+      connectionTimeout: 10000,
     });
   }
   
