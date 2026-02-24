@@ -38,29 +38,38 @@ const contactLimiter = rateLimit({
 });
 
 // ─── CORS ─────────────────────────────────────────────────────────────────────
-const allowedOrigins = [
-  process.env.FRONTEND_URL, // سيقرأ الرابط من Render
-  'http://localhost:5173',
-  'http://localhost:3000',
-].filter(Boolean); // يحذف أي قيم فارغة
+// const allowedOrigins = [
+//   process.env.FRONTEND_URL, // سيقرأ الرابط من Render
+//   'http://localhost:5173',
+//   'http://localhost:3000',
+// ].filter(Boolean); // يحذف أي قيم فارغة
 
+// app.use(cors({
+//   origin: (origin, callback) => {
+//     // في الإنتاج، origin قد يكون undefined في بعض الطلبات، لذا نسمح به
+//     if (!origin || allowedOrigins.includes(origin)) {
+//       callback(null, true);
+//     } else {
+//       console.log('Blocked by CORS:', origin); // للتشخيص
+//       callback(new Error('Not allowed by CORS'));
+//     }
+//   },
+//   methods: ['GET', 'POST'],
+//   credentials: true,
+// }));
+
+// app.use(express.json({ limit: '10kb' }));
+// app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+// ─── CORS (الحل السريع والنهائي للمشكلة الحالية) ───────────────────────────────
 app.use(cors({
-  origin: (origin, callback) => {
-    // في الإنتاج، origin قد يكون undefined في بعض الطلبات، لذا نسمح به
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.log('Blocked by CORS:', origin); // للتشخيص
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  methods: ['GET', 'POST'],
-  credentials: true,
+  origin: true, // سيقبل أي رابط يطلب منه البيانات (يحل مشكلة الـ 403)
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 }));
 
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
-
 // ─── Database ─────────────────────────────────────────────────────────────────
 // قمنا بإزالة الخيارات القديمة التي كانت تسبب تحذيرات في سجلاتك
 mongoose.connect(process.env.MONGODB_URI)
